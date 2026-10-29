@@ -30,7 +30,7 @@ Practica7/
 2. **`db` (Servidor de Base de Datos - MySQL 8.0)**:
    - Imagen oficial `mysql:8.0`.
    - Inicializa la base de datos `holamundo_db`.
-   - Expone el puerto `3306`.
+   - Expone el puerto `3307` hacia el host (para evitar conflictos con MySQL local).
    - Persistencia de datos mediante el volumen `db_data`.
 
 ---
@@ -49,3 +49,4 @@ Practica7/
    ```bash
    docker-compose down
    ```
+

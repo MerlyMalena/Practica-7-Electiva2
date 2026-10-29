@@ -1,3 +1,9 @@
+<?php
+// Mostrar todos los errores para diagnóstico en desarrollo
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -31,8 +37,12 @@
             $mensaje_error = '';
             $mysql_version = '';
 
-            // 2. Intentamos conectar a MySQL usando PDO
+            // 2. Intentamos conectar a MySQL asegurando que el driver exista
             try {
+                if (!extension_loaded('pdo_mysql')) {
+                    throw new Exception("La extensión 'pdo_mysql' no está instalada en el contenedor PHP.");
+                }
+
                 $dsn = "mysql:host={$host};dbname={$db_name};charset=utf8mb4";
                 $pdo = new PDO($dsn, $user, $password, [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -40,11 +50,12 @@
                 ]);
                 $conectado = true;
 
-                // Consultamos la versión de MySQL para comprobar que responde
+                // Consultamos la versión de MySQL para comprobar respuesta
                 $stmt = $pdo->query("SELECT VERSION() as version");
                 $mysql_version = $stmt->fetch(PDO::FETCH_ASSOC)['version'];
 
-            } catch (PDOException $e) {
+            } catch (Throwable $e) {
+                // Captura tanto PDOException como Exception genéricas o errores de PHP
                 $conectado = false;
                 $mensaje_error = $e->getMessage();
             }
@@ -82,7 +93,7 @@
             <?php else: ?>
                 <div class="alert alert-warning">
                     <strong>Aviso:</strong> Si acabas de encender los contenedores, MySQL tarda unos segundos en inicializar.<br>
-                    <small>Detalle: <?= htmlspecialchars($mensaje_error) ?></small>
+                    <small><strong>Detalle:</strong> <?= htmlspecialchars($mensaje_error) ?></small>
                 </div>
             <?php endif; ?>
 
