@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # c) Servicio de servidor de aplicación (PHP + Apache)
+  app:
+    build: .
+    container_name: practica7_app
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: holamundo_db
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+
+  # d) Servicio de base de datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: practica7_db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: holamundo_db
+    volumes:
+      - db_data:/var/lib/mysql
+
+# Volumen persistente para los datos de MySQL
+volumes:
+  db_data:
+
